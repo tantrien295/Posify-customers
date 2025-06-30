@@ -207,12 +207,9 @@ function KhachHang() {
                 filtered.map(kh => (
                   <tr key={kh._id || kh.id} className="border-b hover:bg-blue-50 dark:hover:bg-gray-800 transition">
                     <td className="py-3 px-4 font-medium">
-                      <a
-                        href={`/khachhang/${kh._id || kh.id}`}
-                        className="text-[var(--primary,#2563eb)] dark:text-[var(--accent,#9333ea)] hover:underline cursor-pointer"
-                      >
-                        {kh.name}
-                      </a>
+                      <span className="text-[var(--primary,#2563eb)] dark:text-[var(--accent,#9333ea)] hover:underline cursor-pointer">
+                        <Link to={`/khachhang/${kh._id || kh.id}`}>{kh.name}</Link>
+                      </span>
                     </td>
                     <td className="py-3 px-4">{kh.phone}</td>
                     <td className="py-3 px-4">
