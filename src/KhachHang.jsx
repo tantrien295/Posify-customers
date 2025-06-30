@@ -186,7 +186,8 @@ function KhachHang() {
           />
         </div>
         {error && <div className="text-red-600 mb-2 text-center">{error}</div>}
-        <div className="overflow-x-auto rounded-lg shadow mt-2">
+        {/* Bảng cho desktop/tablet */}
+        <div className="overflow-x-auto rounded-lg shadow mt-2 hidden sm:block">
           <table className="min-w-full bg-white dark:bg-gray-900">
             <thead>
               <tr className="bg-blue-50 dark:bg-gray-800 text-[var(--primary,#2563eb)] dark:text-white">
@@ -200,10 +201,10 @@ function KhachHang() {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={5} className="text-center py-6 text-blue-400">Đang tải dữ liệu...</td></tr>
+                <tr><td colSpan={6} className="text-center py-6 text-blue-400">Đang tải dữ liệu...</td></tr>
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="text-center py-6 text-gray-400">Không có khách hàng phù hợp</td>
+                  <td colSpan={6} className="text-center py-6 text-gray-400">Không có khách hàng phù hợp</td>
                 </tr>
               ) : (
                 filtered.map(kh => (
@@ -250,6 +251,51 @@ function KhachHang() {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Card cho mobile */}
+        <div className="sm:hidden mt-2 space-y-3">
+          {loading ? (
+            <div className="text-center py-6 text-blue-400">Đang tải dữ liệu...</div>
+          ) : filtered.length === 0 ? (
+            <div className="text-center py-6 text-gray-400">Không có khách hàng phù hợp</div>
+          ) : (
+            filtered.map(kh => (
+              <div key={kh._id || kh.id} className="bg-white rounded-xl shadow p-4 flex flex-col gap-2 relative">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-blue-700 text-base flex-1">
+                    <Link to={`/khachhang/${kh._id || kh.id}`}>{kh.name}</Link>
+                  </span>
+                  <button
+                    onClick={() => openModal("edit", kh)}
+                    className="text-yellow-600 hover:bg-yellow-100 p-2 rounded-full transition"
+                    title="Sửa"
+                    aria-label="Sửa"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16.862 3.487a2.06 2.06 0 112.915 2.914L7.5 18.678l-4 1 1-4 12.362-12.19z" /></svg>
+                  </button>
+                  <button
+                    onClick={() => handleDelete(kh._id || kh.id)}
+                    className="text-red-600 hover:bg-red-100 p-2 rounded-full transition"
+                    title="Xóa"
+                    aria-label="Xóa"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" /></svg>
+                  </button>
+                </div>
+                <div className="text-sm text-gray-700"><b>SĐT:</b> {kh.phone}</div>
+                <div className="text-sm text-gray-700"><b>Ngày sinh:</b> {(() => {
+                  const dob = kh.birthday || kh.dob;
+                  if (!dob) return "";
+                  const [d, m, y] = dob.split("-");
+                  if (y === "1900" || !y) return `${d}/${m}`;
+                  return `${d}/${m}/${y}`;
+                })()}</div>
+                {kh.address && <div className="text-sm text-gray-700"><b>Địa chỉ:</b> {kh.address}</div>}
+                {kh.note && <div className="text-sm text-gray-700"><b>Ghi chú:</b> {kh.note}</div>}
+              </div>
+            ))
+          )}
         </div>
 
         {/* Modal thêm/sửa/xem */}
