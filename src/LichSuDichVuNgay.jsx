@@ -42,20 +42,6 @@ export default function LichSuDichVuNgay() {
   }, []);
 
 
-  // Đếm số lịch sử dịch vụ trong tháng hiện tại (tính đến ngày hiện tại)
-  const today = new Date();
-  const currentYear = today.getFullYear();
-  const currentMonth = today.getMonth(); // 0-based
-  const currentDate = today.getDate();
-  const countInMonth = histories.filter(h => {
-    if (!h.date) return false;
-    const d = new Date(h.date);
-    return (
-      d.getFullYear() === currentYear &&
-      d.getMonth() === currentMonth &&
-      d.getDate() <= currentDate
-    );
-  }).length;
 
   // Nhóm lịch sử theo ngày (yyyy-mm-dd)
   const groupByDate = histories.reduce((acc, h) => {
@@ -78,11 +64,8 @@ export default function LichSuDichVuNgay() {
   return (
     <div className="min-h-screen bg-gradient-to-tr from-[var(--primary,#2563eb)] via-[var(--accent,#9333ea)] to-pink-100 p-4 transition-colors">
       <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl p-8 mt-8">
-        <div className="flex justify-between items-center mb-4">
+        <div className="mb-4">
           <h2 className="text-xl font-bold text-blue-700">Thống kê lịch sử dịch vụ theo ngày</h2>
-          <div className="text-base font-semibold text-pink-600">
-            Tổng số lịch sử dịch vụ trong tháng này (tính đến hôm nay): <span className="text-2xl text-blue-700">{countInMonth}</span>
-          </div>
         </div>
         {loading ? <div className="text-blue-500">Đang tải...</div> : error ? <div className="text-red-500">{error}</div> : (
           sortedDates.map(date => (

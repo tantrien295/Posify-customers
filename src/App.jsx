@@ -82,8 +82,8 @@ function App() {
             <span className="text-xs text-gray-500 mt-1">(trong tháng này)</span>
           </Link>
         </div>
-        <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-8 mt-4 w-full">
-          <h2 className="text-2xl font-bold mb-4 text-gray-700">Biểu đồ tổng quan <span className="text-xs text-gray-400">(Lượt khách sử dụng dịch vụ 5 tháng gần nhất)</span></h2>
+        <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-8 mt-4 w-full text-center">
+          <h2 className="text-2xl font-bold mb-6 text-gray-700">Biểu đồ tổng quan</h2>
           <div className="h-64 flex items-center justify-center">
             {luotKhachChart.length > 0 ? (
               <Bar
@@ -114,8 +114,10 @@ function App() {
               <div className="text-gray-300 text-lg">[Biểu đồ sẽ hiển thị ở đây]</div>
             )}
           </div>
+          <p className="text-center font-medium mt-2 text-gray-700">Lượt khách sử dụng dịch vụ</p>
+          
           {/* Biểu đồ khách mới 5 tháng gần nhất */}
-          <div className="h-64 flex items-center justify-center mt-8">
+          <div className="h-64 flex items-center justify-center mt-12">
             {khachHangChart.length > 0 ? (
               <Bar
                 data={{
@@ -145,6 +147,7 @@ function App() {
               <div className="text-gray-300 text-lg">[Biểu đồ khách mới sẽ hiển thị ở đây]</div>
             )}
           </div>
+          <p className="text-center font-medium mt-2 text-gray-700">Khách hàng mới</p>
         </div>
       </div>
     </div>
