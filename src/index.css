@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #2563eb;
+  --accent: #9333ea;
+}
+
+html.dark {
+  background: #18181b;
+  color-scheme: dark;
+}
