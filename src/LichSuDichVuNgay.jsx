@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 const API = "https://customer-management-app-t05h.onrender.com/api";
 
@@ -75,23 +76,30 @@ export default function LichSuDichVuNgay() {
     }));
   };
 
-  // Format date for display
+  // Format date for display (DD-MM-YYYY)
   const formatDisplayDate = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
-    return date.toLocaleDateString('vi-VN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
+    if (isNaN(date.getTime())) return '';
+    
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    
+    return `${day}-${month}-${year}`;
   };
 
-  // Nhóm lịch sử theo ngày (yyyy-mm-dd)
+  // Nhóm lịch sử theo ngày (dd-mm-yyyy)
   const groupByDate = filteredHistories.reduce((acc, h) => {
     let d = h.date;
-    if (d && typeof d === 'string' && d.length > 9) {
-      const dt = new Date(d);
-      if (!isNaN(dt)) d = dt.toISOString().slice(0, 10);
+    if (d && typeof d === 'string') {
+      const date = new Date(d);
+      if (!isNaN(date.getTime())) {
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        d = `${day}-${month}-${year}`;
+      }
     }
     if (!d) d = 'Không xác định';
     if (!acc[d]) acc[d] = [];
@@ -207,7 +215,17 @@ export default function LichSuDichVuNgay() {
                 {groupByDate[date].map((his, idx) => (
                   <div key={idx} className="bg-blue-50 rounded-xl shadow p-4 flex flex-col gap-2">
                     <div className="font-bold text-blue-700 text-base mb-1">
-                      {customers.find(c => String(c._id || c.id) === String(his.customerId))?.name || ''}
+                      {(() => {
+                        const customer = customers.find(c => String(c._id || c.id) === String(his.customerId));
+                        return customer ? (
+                          <Link 
+                            to={`/khachhang/${customer._id || customer.id}`}
+                            className="hover:underline"
+                          >
+                            {customer.name}
+                          </Link>
+                        ) : '';
+                      })()}
                     </div>
                     <div className="text-sm text-gray-700"><b>Nhân viên:</b> {staff.find(s => String(s._id || s.id) === String(his.staffId))?.name || ''}</div>
                     <div className="text-sm text-gray-700"><b>Dịch vụ:</b> {services.find(s => String(s._id || s.id) === String(his.serviceId))?.name || ''}</div>

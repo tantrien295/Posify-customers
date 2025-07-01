@@ -75,42 +75,44 @@ function KhachHang() {
       // Lấy ngày sinh từ cả hai trường có thể có
       const dob = kh.birthday || kh.dob || "";
       console.log('Ngày sinh từ API:', dob);
-      let d = "", m = "", y = "";
       
-      if (dob) {
-        // Xử lý định dạng ngày tháng (có thể là YYYY-MM-DD hoặc DD-MM-YYYY)
-        const parts = dob.split(/[-/]/);
-        
-        if (parts.length === 3) {
-          // Kiểm tra xem phần đầu tiên có phải là năm không (4 chữ số)
-          if (parts[0].length === 4) {
-            // Định dạng YYYY-MM-DD
-            y = parts[0];
-            m = parts[1];
-            d = parts[2];
-          } else {
-            // Định dạng DD-MM-YYYY
-            d = parts[0];
-            m = parts[1];
-            y = parts[2];
-          }
-          
-          // Loại bỏ số 0 đứng đầu nếu có
-          d = d.replace(/^0+/, '');
-          m = m.replace(/^0+/, '');
-          y = y.replace(/^0+/, '');
-        }
-      }
-      
-      setForm({
+      // Reset form trước
+      const formData = {
         name: kh.name || "",
         phone: kh.phone || "",
         address: kh.address || "",
-        day: d,
-        month: m,
-        year: (y && y !== "1900") ? y : "",
+        day: "",
+        month: "",
+        year: "",
         note: kh.note || ""
-      });
+      };
+      
+      if (dob) {
+        // Xử lý định dạng ngày tháng (có thể là DD-MM-YYYY hoặc YYYY-MM-DD)
+        const parts = dob.split(/[-/]/);
+        
+        if (parts.length >= 2) {
+          if (parts[0].length === 4) {
+            // Định dạng YYYY-MM-DD
+            formData.year = parts[0] !== "1900" ? parts[0] : "";
+            formData.month = parts[1] || "";
+            formData.day = parts[2] || "";
+          } else {
+            // Định dạng DD-MM-YYYY
+            formData.day = parts[0] || "";
+            formData.month = parts[1] || "";
+            formData.year = (parts[2] && parts[2] !== "1900") ? parts[2] : "";
+          }
+          
+          // Loại bỏ số 0 đứng đầu
+          if (formData.day) formData.day = formData.day.replace(/^0+/, '');
+          if (formData.month) formData.month = formData.month.replace(/^0+/, '');
+          if (formData.year) formData.year = formData.year.replace(/^0+/, '');
+        }
+      }
+      
+      console.log('Dữ liệu form sau khi xử lý:', formData);
+      setForm(formData);
     } else if (type === "add") {
       setForm({ name: "", phone: "", address: "", day: "", month: "", year: "", note: "" });
     }
@@ -154,8 +156,13 @@ function KhachHang() {
     setLoading(true);
     setError("");
     let birthday = null;
-    if (form.day && form.month) {
-      birthday = `${form.day.padStart(2, "0")}-${form.month.padStart(2, "0")}-${form.year ? form.year : "1900"}`;
+    
+    // Chỉ tạo chuỗi birthday nếu có ít nhất ngày hoặc tháng
+    if (form.day || form.month) {
+      const day = form.day ? form.day.padStart(2, "0") : "01";
+      const month = form.month ? form.month.padStart(2, "0") : "01";
+      const year = form.year || "1900";
+      birthday = `${day}-${month}-${year}`;
     }
     try {
       const res = await fetch(`${API}/${modal.kh._id || modal.kh.id}`, {
