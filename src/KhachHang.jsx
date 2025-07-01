@@ -10,6 +10,7 @@ const API = "https://customer-management-app-t05h.onrender.com/api/customers";
 function KhachHang() {
   const [search, setSearch] = useState("");
   const [searchMonth, setSearchMonth] = useState("");
+  const [searchDay, setSearchDay] = useState("");
   const [data, setData] = useState([]);
   const [modal, setModal] = useState({ open: false, type: null, kh: null });
   const [form, setForm] = useState({ name: "", phone: "", address: "", day: "", month: "", year: "", note: "" });
@@ -38,17 +39,31 @@ function KhachHang() {
       kh.phone?.includes(s) ||
       kh.dob?.includes(s)
     );
-    if (searchMonth) {
-      // Hỗ trợ lọc tháng sinh (dạng 1 hoặc 01)
-      const dob = kh.birthday || kh.dob || "";
-      let month = "";
-      if (dob) {
-        const parts = dob.split("-");
-        if (parts.length >= 2) month = parts[1];
+    
+    const dob = kh.birthday || kh.dob || "";
+    let day = "";
+    let month = "";
+    
+    if (dob) {
+      const parts = dob.split(/[-/]/);
+      if (parts.length >= 2) {
+        month = parts[1];
+        if (parts.length >= 3) {
+          day = parts[0].length === 4 ? parts[2] : parts[0];
+        }
       }
-      // So sánh tháng (cho phép nhập 1 hoặc 01)
+    }
+    
+    // Lọc theo tháng nếu có
+    if (searchMonth) {
       match = match && (month === searchMonth.padStart(2, "0"));
     }
+    
+    // Lọc theo ngày nếu có
+    if (searchDay) {
+      match = match && (day === searchDay.padStart(2, "0"));
+    }
+    
     return match;
   });
 
@@ -56,21 +71,44 @@ function KhachHang() {
   const openModal = (type, kh = null) => {
     setModal({ open: true, type, kh });
     if (type === "edit" && kh) {
-      // Tách ngày sinh thành day, month, year
+      console.log('Dữ liệu khách hàng khi mở modal:', kh);
+      // Lấy ngày sinh từ cả hai trường có thể có
+      const dob = kh.birthday || kh.dob || "";
+      console.log('Ngày sinh từ API:', dob);
       let d = "", m = "", y = "";
-      if (kh.dob) {
-        const parts = kh.dob.split("-");
+      
+      if (dob) {
+        // Xử lý định dạng ngày tháng (có thể là YYYY-MM-DD hoặc DD-MM-YYYY)
+        const parts = dob.split(/[-/]/);
+        
         if (parts.length === 3) {
-          y = parts[0]; m = parts[1]; d = parts[2];
+          // Kiểm tra xem phần đầu tiên có phải là năm không (4 chữ số)
+          if (parts[0].length === 4) {
+            // Định dạng YYYY-MM-DD
+            y = parts[0];
+            m = parts[1];
+            d = parts[2];
+          } else {
+            // Định dạng DD-MM-YYYY
+            d = parts[0];
+            m = parts[1];
+            y = parts[2];
+          }
+          
+          // Loại bỏ số 0 đứng đầu nếu có
+          d = d.replace(/^0+/, '');
+          m = m.replace(/^0+/, '');
+          y = y.replace(/^0+/, '');
         }
       }
+      
       setForm({
         name: kh.name || "",
         phone: kh.phone || "",
         address: kh.address || "",
         day: d,
         month: m,
-        year: y && y !== "1900" ? y : "",
+        year: (y && y !== "1900") ? y : "",
         note: kh.note || ""
       });
     } else if (type === "add") {
@@ -166,22 +204,45 @@ function KhachHang() {
         <div className="mb-4 flex flex-col sm:flex-row gap-2">
           <input
             type="text"
-            placeholder="Tìm theo tên, SĐT hoặc tháng sinh..."
-            className="w-full sm:w-80 px-4 py-2 border border-gray-300 dark:bg-gray-800 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary,#2563eb)]"
+            placeholder="Tìm theo tên hoặc SĐT..."
+            className="w-full sm:w-64 px-4 py-2 border border-gray-300 dark:bg-gray-800 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary,#2563eb)]"
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
           <input
             type="number"
-            min="1"
+            min=""
+            max="31"
+            placeholder="Ngày sinh"
+            className="w-full sm:w-28 px-4 py-2 border border-gray-300 dark:bg-gray-800 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary,#2563eb)]"
+            value={searchDay}
+            onChange={e => {
+              let v = e.target.value;
+              if (v === '') {
+                setSearchDay('');
+                return;
+              }
+              v = v.replace(/[^0-9]/g, '');
+              if (v > 31) v = "31";
+              setSearchDay(v);
+            }}
+          />
+          <input
+            type="number"
+            min=""
             max="12"
             placeholder="Tháng sinh"
-            className="w-full sm:w-40 px-4 py-2 border border-gray-300 dark:bg-gray-800 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary,#2563eb)]"
+            className="w-full sm:w-28 px-4 py-2 border border-gray-300 dark:bg-gray-800 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary,#2563eb)]"
             value={searchMonth}
             onChange={e => {
               let v = e.target.value;
-              if (v.length > 2) v = v.slice(0, 2);
-              setSearchMonth(v.replace(/[^0-9]/g, ""));
+              if (v === '') {
+                setSearchMonth('');
+                return;
+              }
+              v = v.replace(/[^0-9]/g, '');
+              if (v > 12) v = "12";
+              setSearchMonth(v);
             }}
           />
         </div>
