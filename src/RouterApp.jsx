@@ -1,6 +1,6 @@
 
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import App from "./App";
 import KhachHang from "./KhachHang";
 import Navbar from "./Navbar";
@@ -12,7 +12,7 @@ const Settings = React.lazy(() => import("./Settings"));
 
 export default function RouterApp() {
   return (
-    <BrowserRouter>
+    <Router>
       <Navbar />
       <Routes>
         <Route path="/" element={<App />} />
@@ -43,6 +43,6 @@ export default function RouterApp() {
           </React.Suspense>
         } />
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
 }
